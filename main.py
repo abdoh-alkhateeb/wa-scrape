@@ -26,7 +26,7 @@ def main():
     sleep(5)
 
     try:
-        with open("session.gz", "rb") as f:
+        with gzip.open("session.gz", "rb") as f:
             cookies = pickle.load(f)
         for cookie in cookies:
             driver.add_cookie(cookie)
