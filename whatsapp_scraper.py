@@ -1,4 +1,5 @@
 import os
+import shutil
 import tarfile
 from time import sleep
 from selenium import webdriver
@@ -8,19 +9,20 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
 
+USER_PROFILE_PATH = "temp/user-data"
+
+
 class WhatsAppScraper:
     def __init__(self):
-        os.environ["TMPDIR"] = "temp"
-
-        options = webdriver.FirefoxOptions()
+        options = webdriver.ChromeOptions()
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-plugins-discovery")
 
         WhatsAppScraper.inflate_session_file()
-        options.add_argument("--user-data-dir=temp/user_data")
+        options.add_argument(f"--user-data-dir={USER_PROFILE_PATH}")
 
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Chrome(options=options)
         self.authenticate()
 
         self.driver.get("https://web.whatsapp.com")
@@ -30,9 +32,11 @@ class WhatsAppScraper:
     @staticmethod
     def inflate_session_file():
         try:
-            if not os.path.exists("temp/user_data"):
-                with tarfile.open("session.tar.gz", "r:gz") as tar:
-                    tar.extractall(path=".")
+            if os.path.exists(USER_PROFILE_PATH):
+                shutil.rmtree(USER_PROFILE_PATH)
+
+            with tarfile.open("session.tar.gz", "r:gz") as tar:
+                tar.extractall(path=".")
         except FileNotFoundError:
             pass
 
@@ -48,8 +52,11 @@ class WhatsAppScraper:
 
     @staticmethod
     def deflate_session_file():
-        with tarfile.open("session.tar.gz", "w:gz") as tar:
-            tar.add("temp/user_data")
+        try:
+            with tarfile.open("session.tar.gz", "w:gz") as tar:
+                tar.add(USER_PROFILE_PATH)
+        except FileNotFoundError:
+            os.remove("session.tar.gz")
 
     def cleanup(self):
         self.driver.quit()
