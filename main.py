@@ -2,7 +2,15 @@ from whatsapp_scraper import WhatsAppScraper
 
 
 def main():
-    WhatsAppScraper()
+    try:
+        scraper = WhatsAppScraper()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        try:
+            scraper.cleanup()
+        except UnboundLocalError:
+            pass
 
 
 if __name__ == "__main__":
