@@ -12,7 +12,7 @@ class WhatsAppScraper:
     def __init__(self):
         os.environ["TMPDIR"] = "temp"
 
-        options = webdriver.ChromeOptions()
+        options = webdriver.FirefoxOptions()
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-extensions")
         options.add_argument("--disable-plugins-discovery")
@@ -20,7 +20,7 @@ class WhatsAppScraper:
         WhatsAppScraper.inflate_session_file()
         options.add_argument("--user-data-dir=temp/user_data")
 
-        self.driver = webdriver.Chrome(options=options)
+        self.driver = webdriver.Firefox(options=options)
         self.authenticate()
 
         self.driver.get("https://web.whatsapp.com")
